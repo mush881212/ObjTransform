@@ -39,14 +39,16 @@ def make_rotate(rx, ry, rz):
 def save_obj_mesh(mesh_path, verts, faces, normdata, uvdata, facenorm, faceuv, mtlname, usemtl):
     file = open(mesh_path, 'w')
     
-    file.write('mtllib %s \n' % mtlname)
+    if mtlname != "":
+        file.write('mtllib %s \n' % mtlname)
     for v in verts:
         file.write('v %.4f %.4f %.4f\n' % (v[0], v[1], v[2]))
     for n in normdata:
         file.write('vn %f %f %f\n' % (n[0], n[1], n[2]))
     for uv in uvdata:
         file.write('vt %f %f\n' % (uv[0], uv[1]))
-    file.write('usemtl %s \n' % usemtl)
+    if usemtl != "":
+        file.write('usemtl %s \n' % usemtl)
 
     if len(faceuv)!=0 and len(facenorm)!=0:
         for f, fu, fn in zip(faces, faceuv, facenorm):
@@ -72,6 +74,9 @@ def load_obj_mesh(mesh_file, with_normal=False, with_texture=False):
     face_data = []
     face_norm_data = []
     face_uv_data = []
+    mtlname =""
+    usemtl = ""
+
 
     if isinstance(mesh_file, str):
         f = open(mesh_file, "r")
@@ -173,9 +178,10 @@ if __name__=="__main__":
     parser.add_argument('-i', '--input', type=str, default='rp_dennis_posed_004_OBJ')
     args = parser.parse_args()
     obj = ""
-    for file in os.listdir(args.input):
-        if file[-4:] == '.OBJ' or file[-4:] == '.obj':
-            obj = file
-    output = os.path.join(args.input, obj[:-4]+"_new.obj")
-    file = os.path.join(args.input, obj)
-    trans(file, output)
+    if args.input[-4:] == '.OBJ' or args.input[-4:] == '.obj':
+        obj = args.input
+    if obj == "":
+        print("Not a obj file")
+        exit()
+    output = os.path.join(obj[:-4]+"_new.obj")
+    trans(obj, output)
